@@ -125,6 +125,8 @@ El diseño permite realizar fácilmente consultas como:
 
 
 
+# SQL Script:
+
 
 CREATE DATABASE ConcesionarioVehiculos;
 USE ConcesionarioVehiculos;
