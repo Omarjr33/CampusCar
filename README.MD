@@ -128,10 +128,20 @@ El diseño permite realizar fácilmente consultas como:
 # SQL Script:
 
 
+## Base de Datos para Concesionario de Vehículos
+
+## Creación de la Base de Datos
+
+```sql
 CREATE DATABASE ConcesionarioVehiculos;
 USE ConcesionarioVehiculos;
+```
 
+## Tablas
 
+### Tabla VEHICULO
+
+```sql
 CREATE TABLE VEHICULO (
     vehiculo_id INT AUTO_INCREMENT PRIMARY KEY,
     vin VARCHAR(17) NOT NULL UNIQUE,
@@ -148,8 +158,11 @@ CREATE TABLE VEHICULO (
     CONSTRAINT chk_vehiculo_anio CHECK (anio BETWEEN 1900 AND YEAR(CURDATE())+1),
     CONSTRAINT chk_vehiculo_precio CHECK (precio > 0)
 );
+```
 
+### Tabla CLIENTE
 
+```sql
 CREATE TABLE CLIENTE (
     cliente_id INT AUTO_INCREMENT PRIMARY KEY,
     nombre VARCHAR(100) NOT NULL,
@@ -157,16 +170,22 @@ CREATE TABLE CLIENTE (
     email VARCHAR(100) NOT NULL,
     direccion VARCHAR(200) NOT NULL
 );
+```
 
+### Tabla VENDEDOR
 
+```sql
 CREATE TABLE VENDEDOR (
     vendedor_id INT AUTO_INCREMENT PRIMARY KEY,
     numero_empleado VARCHAR(20) NOT NULL UNIQUE,
     nombre VARCHAR(100) NOT NULL,
     fecha_contratacion DATE NOT NULL
 );
+```
 
+### Tabla VENTA
 
+```sql
 CREATE TABLE VENTA (
     venta_id INT AUTO_INCREMENT PRIMARY KEY,
     fecha_venta DATE NOT NULL,
@@ -179,8 +198,11 @@ CREATE TABLE VENTA (
     CONSTRAINT chk_venta_total CHECK (total > 0),
     CONSTRAINT chk_venta_metodo_pago CHECK (metodo_pago IN ('tarjeta', 'transferencia', 'efectivo', 'financiamiento'))
 );
+```
 
+### Tabla DETALLE_VENTA
 
+```sql
 CREATE TABLE DETALLE_VENTA (
     detalle_venta_id INT AUTO_INCREMENT PRIMARY KEY,
     venta_id INT NOT NULL,
@@ -191,8 +213,11 @@ CREATE TABLE DETALLE_VENTA (
     CONSTRAINT chk_detalle_venta_precio CHECK (precio_venta > 0),
     CONSTRAINT uk_vehiculo_venta UNIQUE (vehiculo_id)
 );
+```
 
+### Tabla SERVICIO_MANTENIMIENTO
 
+```sql
 CREATE TABLE SERVICIO_MANTENIMIENTO (
     servicio_id INT AUTO_INCREMENT PRIMARY KEY,
     tipo_servicio VARCHAR(50) NOT NULL,
@@ -206,8 +231,13 @@ CREATE TABLE SERVICIO_MANTENIMIENTO (
     CONSTRAINT chk_servicio_costo CHECK (costo > 0),
     CONSTRAINT chk_tipo_servicio CHECK (tipo_servicio IN ('preventivo', 'correctivo', 'revision', 'garantia'))
 );
+```
 
+## Triggers
 
+### Trigger para Actualizar Disponibilidad de Vehículo
+
+```sql
 DELIMITER //
 CREATE TRIGGER after_detalle_venta_insert
 AFTER INSERT ON DETALLE_VENTA
@@ -218,8 +248,11 @@ BEGIN
     WHERE vehiculo_id = NEW.vehiculo_id;
 END//
 DELIMITER ;
+```
 
+### Trigger para Verificar Disponibilidad antes de Venta
 
+```sql
 DELIMITER //
 CREATE TRIGGER before_detalle_venta_insert
 BEFORE INSERT ON DETALLE_VENTA
@@ -237,8 +270,11 @@ BEGIN
     END IF;
 END//
 DELIMITER ;
+```
 
+## Índices
 
+```sql
 CREATE INDEX idx_vehiculo_marca_modelo ON VEHICULO(marca, modelo);
 CREATE INDEX idx_vehiculo_disponible ON VEHICULO(disponible);
 CREATE INDEX idx_venta_fecha ON VENTA(fecha_venta);
@@ -247,3 +283,4 @@ CREATE INDEX idx_venta_vendedor ON VENTA(vendedor_id);
 CREATE INDEX idx_servicio_vehiculo ON SERVICIO_MANTENIMIENTO(vehiculo_id);
 CREATE INDEX idx_servicio_cliente ON SERVICIO_MANTENIMIENTO(cliente_id);
 CREATE INDEX idx_servicio_fecha ON SERVICIO_MANTENIMIENTO(fecha_servicio);
+```
